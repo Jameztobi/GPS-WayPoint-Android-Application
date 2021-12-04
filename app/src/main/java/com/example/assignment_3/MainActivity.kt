@@ -1,0 +1,13 @@
+package com.example.assignment_3
+
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        //var compassView = findViewById<CustomView>(R.id.compass_view)
+
+    }
+}
