@@ -17,16 +17,22 @@ class CustomView(context: Context?, attribs: AttributeSet?) : View(context, attr
     private var _canvas: Canvas? = null
     private lateinit var outerCircleColor: Paint
     private lateinit var innerCircleColor: Paint
+    private lateinit var pointerColor: Paint
     private lateinit var labelColor: Paint
+    private var checker: Boolean = false
+    private var value = 0.0f
 
     init{
         outerCircleColor= Paint(Paint.ANTI_ALIAS_FLAG)
         innerCircleColor = Paint(Paint.ANTI_ALIAS_FLAG)
+        pointerColor = Paint(Paint.ANTI_ALIAS_FLAG)
         labelColor = Paint(Paint.ANTI_ALIAS_FLAG)
         labelColor.textSize=50f
         outerCircleColor.color=Color.BLACK
         innerCircleColor.color=Color.RED
         labelColor.color = Color.BLACK
+        pointerColor.color=Color.RED
+        pointerColor.strokeWidth=15f
         outerCircleColor.style=Paint.Style.STROKE
         outerCircleColor.strokeWidth=15f
 
@@ -48,11 +54,11 @@ class CustomView(context: Context?, attribs: AttributeSet?) : View(context, attr
         drawEast()
         drawWest()
         drawArrow(canvas_width/2, canvas_width/14, canvas_width/4)
+        setPointer()
         canvas.drawLine(canvas_width*0.50f, 250f, canvas_width*0.50f, 850f, labelColor)
         canvas.drawLine(250f, canvas_width*0.50f, 850f, canvas_width*0.50f, labelColor)
         super.onDraw(canvas)
     }
-
 
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -103,18 +109,9 @@ class CustomView(context: Context?, attribs: AttributeSet?) : View(context, attr
         _canvas?.drawText("E", canvas_width*0.80f, canvas_height.toFloat()/2f, labelColor)
     }
 
-    private fun drawArrow(){
+    private fun drawPointer(){
         _canvas?.save()
-        _canvas?.translate(canvas_width/4.0f, 3.0f*canvas_height/4f)
-        var a: Point = Point(-canvas_width/2, canvas_width/2)
-        var b: Point = Point(canvas_width/2, canvas_width/2)
-        var c: Point = Point(0, canvas_width/2)
-        var path: Path = Path()
-//        path.lineTo(a.x.toFloat(), a.y.toFloat())
-        path.lineTo(b.x.toFloat(), b.y.toFloat())
-        path.lineTo(c.x.toFloat(), c.y.toFloat())
-        path.close()
-        _canvas?.drawPath(path, labelColor)
+        _canvas?.drawLine(canvas_width/2f, canvas_width/2f, canvas_width/2f, canvas_height.toFloat()/4.5f, pointerColor)
         _canvas?.restore()
     }
 
@@ -127,7 +124,27 @@ class CustomView(context: Context?, attribs: AttributeSet?) : View(context, attr
         path.lineTo(x.toFloat(), y-halfwidth.toFloat())
         path.close()
         _canvas?.drawPath(path, labelColor)
+    }
 
+    fun getDegree(x: Float){
+        checker = true;
+        value=x
+        updatePointer()
+    }
+    private fun setPointer() {
+        if (!checker) {
+            drawPointer()
+        } else {
+            updatePointer()
+        }
+    }
+
+    private fun updatePointer(){
+        _canvas?.save()
+        _canvas?.rotate(value, canvas_width/2f, canvas_width/2f)
+        _canvas?.drawLine(canvas_width/2f, canvas_width/2f, canvas_width/2f, canvas_height.toFloat()/4.5f, pointerColor)
+        _canvas?.restore()
+        invalidate()
     }
 
 
