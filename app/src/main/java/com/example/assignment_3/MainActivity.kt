@@ -42,12 +42,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var wayPointBtn: Button
     private lateinit var clearWayPointBtn: Button
     private lateinit var btnSelect: Button
+    private lateinit var btnStart: Button
+    private lateinit var btnEnd: Button
     private var wayPointList: ArrayList<String> = ArrayList()
     private val sharedPrefFile = "kotlinsharedpreferences"
     private lateinit var sharedPreferences: SharedPreferences
     private var wayPointCounter = 0
     private var temp = 0
     private var count = 0
+    private var temp_key = 0
     private var retrieveWayPointList: ArrayList<String> = ArrayList()
     private var wayPointSelected: Boolean = false
     private lateinit var leftBtn: Button
@@ -68,6 +71,14 @@ class MainActivity : AppCompatActivity() {
         rightBtn = findViewById(R.id.btn_right)
         btnSelect = findViewById(R.id.btnSelect)
         distancetext = findViewById(R.id.distance)
+        btnStart = findViewById(R.id.addStartTracking)
+        btnEnd = findViewById(R.id.addEndTracking)
+
+        //disable button view
+        wayPointBtn.visibility=Button.GONE
+        clearWayPointBtn.visibility=Button.GONE
+
+
         sharedPreferences = this.getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
         _sm = getSystemService(SENSOR_SERVICE) as SensorManager
         // get access to the location manager
@@ -89,35 +100,64 @@ class MainActivity : AppCompatActivity() {
                 var locationList: ArrayList<String> = ArrayList()
                 locationList.add(getLatitude().toString())
                 locationList.add(getLongitude().toString())
-                SharedPreferencesUtil.addList(sharedPreferences, locationList, wayPointCounter.toString())
-                temp=SharedPreferencesUtil.getSize(sharedPreferences)/3
+                SharedPreferencesUtil.addList(
+                    sharedPreferences,
+                    locationList,
+                    wayPointCounter.toString()
+                )
+                temp = SharedPreferencesUtil.getSize(sharedPreferences) / 3
                 wayPointList.clear()
                 settingValues()
             }
-
-
         })
-        clearWayPointBtn.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(p0: View?) {
-                alertDialog()
-            }
 
-        })
+        clearWayPointBtn.setOnClickListener{
+            alertDialog()
+        }
 
         btnSelect.setOnClickListener(object : View.OnClickListener {
             override fun onClick(p0: View?) {
-                var retrieveList: ArrayList<String> = ArrayList()
-                var textString = currentWayPoint.text
-                var len = textString.replace("[^0-9]".toRegex(), "")
-                var tempKey = len.toInt()-1
-                var currentRetrieveWayPointList = SharedPreferencesUtil.retrieveSharedList(sharedPreferences, tempKey.toString())
-                getDestinationDegree(currentRetrieveWayPointList, tempKey)
-                setDistance(currentRetrieveWayPointList)
+                if(currentWayPoint.text=="No wayPoint"){
+                    showMessages("You have not saved any wayPoint")
+                    return
+                }else{
+                    var retrieveList: ArrayList<String> = ArrayList()
+                    var textString = currentWayPoint.text
+                    var len = textString.replace("[^0-9]".toRegex(), "")
+                    var tempKey = len.toInt() - 1
+                    var currentRetrieveWayPointList =
+                        SharedPreferencesUtil.retrieveSharedList(sharedPreferences, tempKey.toString())
+                    retrieveWayPointList = currentRetrieveWayPointList
+                    temp_key=tempKey
+                    getDestinationDegree()
+                    setDistance()
+                    compassView.invalidate()
+                }
             }
-
         })
 
+        btnStart.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(p0: View?) {
+                addLocationListener()
+                wayPointBtn.visibility=Button.VISIBLE
+                clearWayPointBtn.visibility=Button.VISIBLE
+            }
+        })
+
+        btnEnd.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(p0: View?) {
+                removeLocationListener()
+                wayPointBtn.visibility=Button.INVISIBLE
+                clearWayPointBtn.visibility=Button.INVISIBLE
+            }
+        })
+
+
     }
+
+
+
+
 
     private fun retrieveDistanceInDegrees(text: ArrayList<String>): Float {
         var latitudePoint: Double = text[0].toDouble()
@@ -148,9 +188,11 @@ class MainActivity : AppCompatActivity() {
     private fun settingValues() {
         when {
             SharedPreferencesUtil.getSize(sharedPreferences)==0 -> {
-                currentWayPoint.setText("No wayPoint ")
+                currentWayPoint.setText("No wayPoint")
             }
             SharedPreferencesUtil.getSize(sharedPreferences) > 0 -> {
+                val compass_view = findViewById<CustomView>(R.id.compass_view)
+                compass_view.invalidate()
                 wayPointCounter = SharedPreferencesUtil.getSize(sharedPreferences)/3
                 setDefaultWayPoint()
                 getWayPoints()
@@ -170,11 +212,10 @@ class MainActivity : AppCompatActivity() {
                 Log.d("Latitude", getLatitude().toString())
                 Log.d("Longitude", getLongitude().toString())
                 setWayPointCompass()
-
             }
         }
     }
-//
+
     private fun leftBtnController(){
          var textString = currentWayPoint.text
          var len = textString.replace("[^0-9]".toRegex(), "")
@@ -202,8 +243,8 @@ class MainActivity : AppCompatActivity() {
         currentWayPoint.text = wayPointList[temp-1]
     }
 
-    private fun setDistance(myPointList: ArrayList<String>) {
-        var distanceCovered=retrieveDistanceInMetres(myPointList)
+    private fun setDistance() {
+        var distanceCovered=retrieveDistanceInMetres(retrieveWayPointList)
         Log.d("distance", distanceCovered.toString())
         distancetext.text=distanceCovered.toString()
     }
@@ -236,6 +277,7 @@ class MainActivity : AppCompatActivity() {
                     _orientation_values[1] = Math.toDegrees(_orientation_values[1].toDouble()).toFloat()
                     _orientation_values[2] = Math.toDegrees(_orientation_values[2].toDouble()).toFloat()
                     getDegree()
+                    compassView.invalidate()
                 }
 
                 override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
@@ -249,6 +291,8 @@ class MainActivity : AppCompatActivity() {
 
     fun setWayPointCompass(){
         if(wayPointCounter>0){
+            val compass_view = findViewById<CustomView>(R.id.compass_view)
+            compass_view.invalidate()
             var distanceArray: ArrayList<Float> = ArrayList()
             var meterArray: ArrayList<Float> = ArrayList()
             for(i in 0 until wayPointCounter){
@@ -264,17 +308,18 @@ class MainActivity : AppCompatActivity() {
             }
             compassView.setWayPointOnView( meterArray, distanceArray)
         }
+
     }
 
 
     fun getDegree(){
-        compassView.getDegree(_orientation_values[0])
-        compassView.invalidate()
+        compassView.setDegree(_orientation_values[0])
+
     }
 
-    fun getDestinationDegree(currentRetrieveWayPointList: ArrayList<String>, tempKey: Int) {
-        compassView.getWayPointDegree(retrieveDistanceInDegrees(currentRetrieveWayPointList), tempKey)
-        compassView.invalidate()
+    fun getDestinationDegree() {
+        compassView.setWayPointDegree(retrieveDistanceInDegrees(retrieveWayPointList), temp_key)
+
     }
 
     private fun getLongitude(): Float{
@@ -283,31 +328,6 @@ class MainActivity : AppCompatActivity() {
 
     private  fun getLatitude(): Float{
         return latitude
-    }
-
-    // function responsible for inflating and attaching our menu
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        // call the inflator for the options menu and attach it to the menu that has been passed // in here
-        menuInflater.inflate(R.menu.menu, menu)
-         // it is a requirement to call this at the end of this function
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    // function that will react to an event on any of hte menu items
-    override fun onOptionsItemSelected(item: MenuItem): Boolean { // determine which menu item was selected
-        when(item.itemId)
-        {
-            R.id.startTracking -> {
-                addLocationListener()
-                return true
-            }
-            R.id.stopTracking -> {
-                removeLocationListener()
-                return true
-            }
-        }
-       // it is a requirement to call this at the end of this function if the event has not been // handled
-        return super.onOptionsItemSelected(item)
     }
 
 
@@ -329,6 +349,11 @@ class MainActivity : AppCompatActivity() {
     //remove the location listener
     private fun removeLocationListener(){
         _lm.removeUpdates(locationLis)
+    }
+
+    private fun showMessages(message: String){
+        var snackbar: Snackbar = Snackbar.make(_linear_layout, message, Snackbar.LENGTH_LONG)
+        snackbar.show()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -353,28 +378,27 @@ class MainActivity : AppCompatActivity() {
         var builder: AlertDialog.Builder = AlertDialog.Builder(this)
         builder.setTitle("Confirm Deletion Action")
         builder.setMessage("Are you sure you will like to clear all your way points")
-
         builder.setPositiveButton("Yes", object: DialogInterface.OnClickListener{
             override fun onClick(p0: DialogInterface?, p1: Int) {
                 SharedPreferencesUtil.clearList(sharedPreferences)
                 wayPointCounter=0
                 temp=0
-                currentWayPoint.setText("No wayPoint ")
+                currentWayPoint.setText("No wayPoint")
                 wayPointList.removeAll(wayPointList)
                 distancetext.text=""
+                compassView.clearWayPoints()
             }
         })
 
         builder.setNegativeButton("No", object: DialogInterface.OnClickListener{
             override fun onClick(p0: DialogInterface?, p1: Int) {
-                TODO("Not yet implemented")
+                showMessages("Action Canceled")
             }
         })
 
         var dialog: AlertDialog = builder.create()
         dialog.show()
     }
-
 
 
 

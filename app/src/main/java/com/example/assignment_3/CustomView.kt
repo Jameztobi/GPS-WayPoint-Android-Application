@@ -178,14 +178,16 @@ class CustomView(context: Context?, attribs: AttributeSet?) : View(context, attr
         _canvas?.restore()
     }
 
-    fun getDegree(x: Float){
+    fun setDegree(x: Float){
         checker = true;
         value=360-x
-        invalidate()
+
+
     }
 
-    fun getWayPointDegree(x: Float, tempKey: Int){
+    fun setWayPointDegree(x: Float, tempKey: Int){
         waypointValue=360-x
+
     }
 
     fun setWayPointOnView(_metersArray: ArrayList<Float>, _degreeArray: ArrayList<Float>){
@@ -193,6 +195,12 @@ class CustomView(context: Context?, attribs: AttributeSet?) : View(context, attr
         degreeArray.clear()
         meterArray=_metersArray
         degreeArray=_degreeArray
+
+    }
+
+    fun clearWayPoints(){
+        meterArray.clear()
+        degreeArray.clear()
     }
 
     private fun getMetersArray(): ArrayList<Float> {

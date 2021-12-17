@@ -11,31 +11,52 @@
     >
 
     <LinearLayout
+        android:id="@+id/wayPoint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:id="@+id/wayPoint"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="20dp"
         >
+
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add WayPoint"
-            android:textSize="15dp"
             android:id="@+id/addWayPointBtn"
-            android:layout_marginStart="20dp"
-            android:layout_marginRight="50dp"
-            android:background="@color/design_default_color_primary"/>
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="2dp"
+            android:background="@color/design_default_color_primary"
+            android:text="Add WayPoint"
+            android:textSize="10dp"
+            />
 
         <Button
-            android:layout_width="wrap_content"
+            android:id="@+id/addStartTracking"
+            android:layout_width="0dp"
+            android:layout_weight="3"
             android:layout_height="wrap_content"
-            android:text="Clear Waypoints"
-            android:textSize="15dp"
-            android:id="@+id/clearWayPointBtn"
-            android:layout_marginStart="20dp"
-            android:background="@color/design_default_color_primary"/>
+            android:layout_marginRight="2dp"
+            android:background="@color/design_default_color_primary"
+            android:text="Start Tracking"
+            android:textSize="10dp" />
 
+        <Button
+            android:id="@+id/addEndTracking"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="2dp"
+            android:background="@color/design_default_color_primary"
+            android:text="End Tracking"
+            android:textSize="10dp" />
+
+        <Button
+            android:id="@+id/clearWayPointBtn"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="2dp"
+            android:background="@color/design_default_color_primary"
+            android:text="Clear Waypoints"
+            android:textSize="10dp" />
     </LinearLayout>
 
 
