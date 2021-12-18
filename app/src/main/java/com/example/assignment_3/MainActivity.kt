@@ -112,7 +112,13 @@ class MainActivity : AppCompatActivity() {
         })
 
         clearWayPointBtn.setOnClickListener{
-            alertDialog()
+            if(currentWayPoint.text.equals("No wayPoint")){
+                showMessages("You have not added any waypoints")
+            }
+            else{
+                alertDialog()
+            }
+
         }
 
         btnSelect.setOnClickListener(object : View.OnClickListener {
@@ -147,8 +153,8 @@ class MainActivity : AppCompatActivity() {
         btnEnd.setOnClickListener(object : View.OnClickListener {
             override fun onClick(p0: View?) {
                 removeLocationListener()
-                wayPointBtn.visibility=Button.INVISIBLE
-                clearWayPointBtn.visibility=Button.INVISIBLE
+                wayPointBtn.visibility=Button.GONE
+                clearWayPointBtn.visibility=Button.GONE
             }
         })
 
@@ -218,23 +224,35 @@ class MainActivity : AppCompatActivity() {
 
     private fun leftBtnController(){
          var textString = currentWayPoint.text
-         var len = textString.replace("[^0-9]".toRegex(), "")
-         count = len.toInt()-1
-         if (count-1 >= 0) {
-             currentWayPoint.text = wayPointList[count-1]
-         }
-         return
+        if(textString.equals("No wayPoint")){
+            showMessages("You have not added any waypoints")
+
+        }
+        else{
+            var len = textString.replace("[^0-9]".toRegex(), "")
+            count = len.toInt()-1
+            if (count-1 >= 0) {
+                currentWayPoint.text = wayPointList[count-1]
+            }
+        }
+
+
     }
 
 
     private fun rightBtnController(){
         var textString = currentWayPoint.text
-        var len = textString.replace("[^0-9]".toRegex(), "")
-        count = len.toInt()
-        if(count<wayPointList.size){
-            currentWayPoint.text=wayPointList[count]
+        if(textString.equals("No wayPoint")){
+            showMessages("You have not added any waypoints")
+
         }
-        return
+        else{
+            var len = textString.replace("[^0-9]".toRegex(), "")
+            count = len.toInt()
+            if(count<wayPointList.size){
+                currentWayPoint.text=wayPointList[count]
+            }
+        }
 
     }
 
@@ -252,7 +270,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setDefaultWayPoint(){
         if(wayPointCounter==0){
-            currentWayPoint.setText("No wayPoint ")
+            currentWayPoint.setText("No wayPoint")
             return
         }
 
