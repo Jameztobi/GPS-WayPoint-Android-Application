@@ -23,6 +23,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import com.google.android.material.snackbar.Snackbar
 import kotlin.collections.ArrayList
+import kotlin.io.path.createTempDirectory
 
 class MainActivity : AppCompatActivity() {
     private lateinit var _rotation: TextView
@@ -117,6 +118,8 @@ class MainActivity : AppCompatActivity() {
             }
             else{
                 alertDialog()
+                currentWayPoint.text.equals("No wayPoint")
+                wayPointSelected= false
             }
 
         }
@@ -137,7 +140,8 @@ class MainActivity : AppCompatActivity() {
                     temp_key=tempKey
                     getDestinationDegree()
                     setDistance()
-                    compassView.invalidate()
+                    wayPointSelected=true
+
                 }
             }
         })
@@ -218,6 +222,12 @@ class MainActivity : AppCompatActivity() {
                 Log.d("Latitude", getLatitude().toString())
                 Log.d("Longitude", getLongitude().toString())
                 setWayPointCompass()
+                if(wayPointSelected){
+                    setDistance()
+                    getDestinationDegree()
+                    nextWayPoint()
+                }
+
             }
         }
     }
@@ -244,7 +254,6 @@ class MainActivity : AppCompatActivity() {
         var textString = currentWayPoint.text
         if(textString.equals("No wayPoint")){
             showMessages("You have not added any waypoints")
-
         }
         else{
             var len = textString.replace("[^0-9]".toRegex(), "")
@@ -329,15 +338,31 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
     fun getDegree(){
+//        findViewById<CustomView>(R.id.compass_view).invalidate()
         compassView.setDegree(_orientation_values[0])
 
     }
 
     fun getDestinationDegree() {
+        findViewById<CustomView>(R.id.compass_view).invalidate()
         compassView.setWayPointDegree(retrieveDistanceInDegrees(retrieveWayPointList), temp_key)
 
+    }
+
+    fun nextWayPoint(){
+        if(retrieveDistanceInMetres(retrieveWayPointList)<=10){
+            var tempKey = temp_key
+            tempKey -= 1
+            var currentRetrieveWayPointList = SharedPreferencesUtil.retrieveSharedList(sharedPreferences, tempKey.toString())
+            if(currentRetrieveWayPointList!= null){
+                retrieveWayPointList=currentRetrieveWayPointList
+                temp_key -= 1
+                currentWayPoint.text = "wayPoint"+(temp_key+1)
+
+            }
+
+        }
     }
 
     private fun getLongitude(): Float{

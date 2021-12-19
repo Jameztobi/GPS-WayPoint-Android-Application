@@ -65,7 +65,7 @@ class CustomView(context: Context?, attribs: AttributeSet?) : View(context, attr
         width = canvas_width-100f
         height = canvas_height/2f
         radius = width
-        _radius= (canvas_width / 8.0f) / 4f
+        _radius= (canvas_width / 8.0f) / 6f
         _canvas=canvas
 
         drawCompass()
@@ -187,6 +187,7 @@ class CustomView(context: Context?, attribs: AttributeSet?) : View(context, attr
 
     fun setWayPointDegree(x: Float, tempKey: Int){
         waypointValue=360-x
+        currentSelectedWayPointNum=tempKey
 
     }
 
