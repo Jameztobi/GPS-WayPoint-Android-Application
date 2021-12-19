@@ -77,8 +77,6 @@ class CustomView(context: Context?, attribs: AttributeSet?) : View(context, attr
         drawWest()
         drawArrow(canvas_width/2, canvas_width/14, canvas_width/4)
         drawPointer()
-        canvas.drawLine(canvas_width*0.50f, 250f, canvas_width*0.50f, 850f, labelColor)
-        canvas.drawLine(250f, canvas_width*0.50f, 850f, canvas_width*0.50f, labelColor)
         drawWayPoint()
         super.onDraw(canvas)
     }

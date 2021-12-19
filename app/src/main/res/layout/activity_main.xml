@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="2dp"
             android:background="@color/design_default_color_primary"
-            android:text="Add WayPoint"
+            android:text="Save WayPoint"
             android:textSize="10dp"
             />
 

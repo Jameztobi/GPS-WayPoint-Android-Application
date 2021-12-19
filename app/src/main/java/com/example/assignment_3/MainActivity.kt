@@ -32,11 +32,7 @@ class MainActivity : AppCompatActivity() {
     private var _orientation_values:FloatArray = FloatArray(4){0f}
     private lateinit var compassView: CustomView
     private lateinit var _linear_layout: RelativeLayout
-    private var hasSensor = false
-    private var hasSensor2 = false
     private lateinit var _lm: LocationManager
-    private lateinit var _handler: ThreadHandler
-    private lateinit var _thread: UpdateThread
     private var latitude: Float = 0.0f
     private var longitude: Float = 0.0f
     private lateinit var locationLis: LocationListener
@@ -120,6 +116,7 @@ class MainActivity : AppCompatActivity() {
                 alertDialog()
                 currentWayPoint.text.equals("No wayPoint")
                 wayPointSelected= false
+                compassView.setWayPointDegree(360f, -1)
             }
 
         }
@@ -130,7 +127,6 @@ class MainActivity : AppCompatActivity() {
                     showMessages("You have not saved any wayPoint")
                     return
                 }else{
-                    var retrieveList: ArrayList<String> = ArrayList()
                     var textString = currentWayPoint.text
                     var len = textString.replace("[^0-9]".toRegex(), "")
                     var tempKey = len.toInt() - 1
@@ -164,8 +160,6 @@ class MainActivity : AppCompatActivity() {
 
 
     }
-
-
 
 
 
@@ -333,13 +327,13 @@ class MainActivity : AppCompatActivity() {
 
                 distanceArray.add(retrieveDistanceInDegrees(value))
             }
+            findViewById<CustomView>(R.id.compass_view).invalidate()
             compassView.setWayPointOnView( meterArray, distanceArray)
         }
 
     }
 
     fun getDegree(){
-//        findViewById<CustomView>(R.id.compass_view).invalidate()
         compassView.setDegree(_orientation_values[0])
 
     }
@@ -351,7 +345,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun nextWayPoint(){
-        if(retrieveDistanceInMetres(retrieveWayPointList)<=10){
+        if(retrieveDistanceInMetres(retrieveWayPointList)<=10 && currentWayPoint.text!="wayPoint1"){
             var tempKey = temp_key
             tempKey -= 1
             var currentRetrieveWayPointList = SharedPreferencesUtil.retrieveSharedList(sharedPreferences, tempKey.toString())
@@ -361,7 +355,6 @@ class MainActivity : AppCompatActivity() {
                 currentWayPoint.text = "wayPoint"+(temp_key+1)
 
             }
-
         }
     }
 
