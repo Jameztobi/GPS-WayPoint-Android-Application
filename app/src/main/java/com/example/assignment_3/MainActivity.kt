@@ -14,16 +14,12 @@ import android.location.LocationListener
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import com.google.android.material.snackbar.Snackbar
 import kotlin.collections.ArrayList
-import kotlin.io.path.createTempDirectory
 
 class MainActivity : AppCompatActivity() {
     private lateinit var _rotation: TextView
@@ -35,7 +31,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var _lm: LocationManager
     private var latitude: Float = 0.0f
     private var longitude: Float = 0.0f
-    private lateinit var locationLis: LocationListener
+    private lateinit var locationListener: LocationListener
     private lateinit var wayPointBtn: Button
     private lateinit var clearWayPointBtn: Button
     private lateinit var btnSelect: Button
@@ -208,13 +204,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun setLocationListener() {
         addRotationListener()
-        locationLis = object : LocationListener {
+        locationListener = object : LocationListener {
             override fun onLocationChanged(p0: Location) {
                 // update the textviews with the current location
                 latitude = p0.latitude.toFloat()
                 longitude = p0.longitude.toFloat()
-                Log.d("Latitude", getLatitude().toString())
-                Log.d("Longitude", getLongitude().toString())
                 setWayPointCompass()
                 if(wayPointSelected){
                     setDistance()
@@ -266,7 +260,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun setDistance() {
         var distanceCovered=retrieveDistanceInMetres(retrieveWayPointList)
-        Log.d("distance", distanceCovered.toString())
         distancetext.text=distanceCovered.toString()
     }
 
@@ -378,13 +371,13 @@ class MainActivity : AppCompatActivity() {
             return
         }
         // private function that will add a location listener that will update every 5 seconds
-        _lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0f, locationLis)
+        _lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0f, locationListener)
 
     }
 
     //remove the location listener
     private fun removeLocationListener(){
-        _lm.removeUpdates(locationLis)
+        _lm.removeUpdates(locationListener)
     }
 
     private fun showMessages(message: String){
