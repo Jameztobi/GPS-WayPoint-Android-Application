@@ -1,6 +1,7 @@
 # GPS-WayPoint-Android-Application
 
 SETTING UP ANDROID STUDIO
+
 First and foremost you will need to download and install 
 Android Studio which is available for Windows/Linux/OSX and can be found at
 https://developer.android.com/studio
